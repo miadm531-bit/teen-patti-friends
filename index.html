@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teen Patti Friends</title>
+  <style>
+    :root {
+      --felt: #0d3b2e;
+      --felt-dark: #07221a;
+      --gold: #f5c542;
+      --gold-dim: #b88b1d;
+      --panel: rgba(8, 28, 22, 0.92);
+      --border: rgba(245, 197, 66, 0.35);
+      --text: #f7f9f8;
+      --muted: #a6bdb4;
+      --danger: #e05353;
+      --ok: #38b778;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: radial-gradient(circle at top, #155945, var(--felt) 55%, var(--felt-dark));
+      color: var(--text);
+      min-height: 100vh;
+      padding: 12px;
+    }
+
+    .app {
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .topbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 14px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 1.15rem;
+      color: var(--gold);
+      letter-spacing: 0.3px;
+    }
+
+    .brand small {
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+    }
+
+    .badge.ok {
+      border-color: rgba(56, 183, 120, 0.5);
+      color: #8ef0be;
+    }
+
+    .table-card {
+      background: var(--panel);
+      border: 1.5px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .pot-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: rgba(0, 0, 0, 0.32);
+      border: 1px solid rgba(245, 197, 66, 0.25);
+      border-radius: 12px;
+      padding: 10px 14px;
+    }
+
+    .pot-amount {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    .timer-box {
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 5px 12px;
+      border-radius: 8px;
+      background: rgba(245, 197, 66, 0.14);
+      color: var(--gold);
+    }
+
+    .timer-box.low {
+      background: rgba(224, 83, 83, 0.22);
+      color: #ff9494;
+    }
+
+    .players-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+      gap: 10px;
+    }
+
+    .player-seat {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+
+    .player-seat.active-turn {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 1px var(--gold), 0 8px 20px rgba(0, 0, 0, 0.35);
+      transform: translateY(-2px);
+    }
+
+    .player-seat.packed {
+      opacity: 0.55;
+    }
+
+    .player-seat.winner {
+      border-color: var(--ok);
+      background: rgba(56, 183, 120, 0.12);
+    }
+
+    .seat-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .seat-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .seat-chips {
+      color: var(--gold);
+      font-weight: 700;
+      font-size: 0.88rem;
+    }
+
+    .seat-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .cards-row {
+      display: flex;
+      gap: 6px;
+      min-height: 54px;
+      align-items: center;
+    }
+
+    .playing-card {
+      width: 38px;
+      height: 52px;
+      border-radius: 6px;
+      background: #fff;
+      color: #161817;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.82rem;
+      line-height: 1.05;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    }
+
+    .playing-card.red {
+      color: #c92a2a;
+    }
+
+    .playing-card.back {
+      background: linear-gradient(135deg, #8b1e24, #4f0d11);
+      color: var(--gold);
+      border: 1px solid rgba(245, 197, 66, 0.5);
+      font-size: 0.72rem;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 13px;
+      font-weight: 700;
+      font-size: 0.86rem;
+      cursor: pointer;
+      color: #0b1914;
+      background: var(--gold);
+    }
+
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    button.secondary {
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    button.danger {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    button.success {
+      background: var(--ok);
+      color: #061810;
+    }
+
+    .log-box {
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.84rem;
+      color: #d6e6df;
+      min-height: 44px;
+    }
+
+    .admin-panel {
+      background: rgba(245, 197, 66, 0.07);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .admin-panel.open {
+      display: flex;
+    }
+
+    .admin-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    select, input {
+      background: rgba(0, 0, 0, 0.4);
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 0.86rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="brand">
+        <h1>Teen Patti Friends</h1>
+        <small>Boot 50 • Blind 10 • Seen 20 • 120s Timer</small>
+      </div>
+      <div class="status-row">
+        <span id="dbStatus" class="badge">Firestore: সংযুক্ত হচ্ছে...</span>
+        <label class="badge">
+          আপনার প্রোফাইল:
+          <select id="currentUserSelect"></select>
+        </label>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="pot-bar">
+        <div>
+          <div style="font-size:0.78rem;color:var(--muted);">মোট পট (Pot)</div>
+          <div id="potDisplay" class="pot-amount">0 চিপস</div>
+        </div>
+        <div>
+          <div style="font-size:0.78rem;color:var(--muted);">বর্তমান চাল</div>
+          <div id="turnInfo" style="font-weight:700;">রাউন্ড শুরু হয়নি</div>
+        </div>
+        <div id="timerDisplay" class="timer-box">02:00</div>
+      </div>
+
+      <div id="playersGrid" class="players-grid"></div>
+
+      <div class="controls">
+        <button id="btnNewRound" class="success">নতুন রাউন্ড (Boot 50)</button>
+        <button id="btnSeeCard" class="secondary">See Card</button>
+        <button id="btnChaal">Chaal</button>
+        <button id="btnSideShow" class="secondary">Side Show</button>
+        <button id="btnFinalShow" class="secondary">Final Show</button>
+        <button id="btnPack" class="danger">Pack</button>
+      </div>
+
+      <div id="gameLog" class="log-box">অপেক্ষা করুন—খেলোয়াড় তালিকা লোড হচ্ছে...</div>
+
+      <div id="adminPanel" class="admin-panel">
+        <div style="font-weight:700;color:var(--gold);">অ্যাডমিন কন্ট্রোল (canViewAllCards)</div>
+        <div class="admin-controls">
+          <select id="adminTargetUser"></select>
+          <input id="adminChipInput" type="number" step="10" placeholder="নতুন চিপস পরিমাণ" />
+          <button id="btnUpdateChips">চিপস আপডেট</button>
+          <button id="btnForceShow" class="secondary">সব কার্ড দেখুন / Show</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      onSnapshot,
+      doc,
+      setDoc,
+      updateDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDummyKeyForTeenPattiFriends",
+      authDomain: "teen-patti-friends-cea43.firebaseapp.com",
+      projectId: "teen-patti-friends-cea43",
+      storageBucket: "teen-patti-friends-cea43.appspot.com",
+      messagingSenderId: "104829173645",
+      appId: "1:104829173645:web:teenpattifriends01"
+    };
+
+    const BOOT_AMOUNT = 50;
+    const BLIND_AMOUNT = 10;
+    const SEEN_AMOUNT = 20;
+    const TURN_SECONDS = 120;
+
+    const FALLBACK_USERS = [
+      { id: "akash", name: "Akash", chips: 500, role: "player", canViewAllCards: false },
+      { id: "bipul", name: "Bipul", chips: 500, role: "player", canViewAllCards: false },
+      { id: "mahir", name: "Mahir", chips: 500, role: "player", canViewAllCards: false },
+      { id: "shanto", name: "Shanto", chips: 500, role: "player", canViewAllCards: false },
+      { id: "sunny", name: "Sunny", chips: 500, role: "player", canViewAllCards: false },
+      { id: "admin", name: "Admin", chips: 1000, role: "admin", canViewAllCards: true }
+    ];
+
+    const RANKS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 
+  
